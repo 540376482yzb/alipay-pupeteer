@@ -10,12 +10,22 @@ class App {
   constructor() {
     this.page = null;
   }
+  static formatingList(tradeNum, amount) {
+    let tempArray = [];
+    for (let i = 0; i < tradeNum.length; i++) {
+      tempArray.push({
+        tradeNo: tradeNum[i],
+        amount: amount[i]
+      });
+    }
+    return tempArray;
+  }
   async init() {
     const browser = await puppeteer.launch({
       headless: false
     });
     this.page = await browser.newPage();
-    await this.page.emulate(devices["iPad"]);
+    //await this.page.emulate(devices["iPad"]);
   }
 
   async redirect() {
@@ -41,12 +51,20 @@ class App {
       await this.page.waitFor("#tradeRecordsIndex");
       console.log(chalk.blue("========== 寻找数据成功 ========"));
       const data = await this.page.evaluate(() => {
-        const tds = Array.from(document.querySelectorAll("table tr td"));
-        return tds.map(td => td.innerHTML);
+        let tradeNum = Array.from(document.querySelectorAll("p"))
+          .map(trade => {
+            return trade.textContent.includes("流水号") ? trade.textContent.split(":")[1] : null;
+          })
+          .filter(el => {
+            return el != null;
+          });
+        const amount = Array.from(document.querySelectorAll("table tr td .amount-pay"));
+        // let dataList = formatingList();
+        return { tradeNum, amount: amount.map(am => am.textContent) };
       });
       if (data) {
-        console.log("I got it");
-        this.redirect();
+        console.log(App.formatingList(data.tradeNum, data.amount));
+        //this.redirect();
       }
     } catch (error) {
       if (
