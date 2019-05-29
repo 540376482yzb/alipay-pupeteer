@@ -28,12 +28,13 @@ class App {
   }
 
   async redirect() {
+    let random = Math.floor(Math.random(5) * 1000);
     try {
       console.log(chalk.blue("========== 进入跳转 ========"));
       await this.page.goto("https://my.alipay.com/portal/i.htm");
       setTimeout(() => {
         this.start();
-      }, 5000);
+      }, 10000 + random);
     } catch (err) {
       console.log(chalk.red("error when redirect"));
     }
@@ -67,6 +68,7 @@ class App {
         let tempArray = await dataBase.compareLogs(foundLog);
         if (tempArray.length > 0) {
           //TODO: send data to king
+          console.log(chalk.red(JSON.stringify(tempArray)));
           dataBase.saveLogs(tempArray);
         }
         this.redirect();
