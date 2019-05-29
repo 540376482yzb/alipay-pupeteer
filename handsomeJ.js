@@ -3,8 +3,6 @@ const devices = require("puppeteer/DeviceDescriptors");
 const chalk = require("chalk");
 
 // TODO: Set up username and password
-const USERNAME = "";
-const PASSWORD = "";
 
 class App {
   constructor() {
