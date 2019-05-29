@@ -3,15 +3,16 @@ const devices = require("puppeteer/DeviceDescriptors");
 const chalk = require("chalk");
 const DBServer = require("./db/db.conn");
 
-// TODO: Set up username and password
-
 class App {
   constructor() {
     this.page = null;
     this.browser = null;
-    this.stop = false;
     this.timer = null;
   }
+
+  /**
+   * Start of FormatingList Function
+   */
   static formatingList(tradeNum, amount) {
     let tempArray = [];
     for (let i = 0; i < tradeNum.length; i++) {
@@ -22,16 +23,28 @@ class App {
     }
     return tempArray;
   }
+  /**
+   * End of FormatingList Function
+   */
+
+  /**
+   * Start of Init Function
+   */
   async init() {
     this.browser = await puppeteer.launch({
       headless: false
     });
     this.page = await this.browser.newPage();
-    this.stop = false;
     this.timer = null;
     //await this.page.emulate(devices["iPad"]);
   }
+  /**
+   * End of Init Function
+   */
 
+  /**
+   * Start of Redirect Function
+   */
   async redirect() {
     let random = Math.floor(Math.random(5) * 1000);
     try {
@@ -44,14 +57,26 @@ class App {
       console.log(chalk.red("error when redirect"));
     }
   }
+  /**
+   * End of Redirect Function
+   */
 
+  /**
+   * Start of StopApp Function
+   */
   stopApp() {
     this.page = null;
     clearTimeout(this.timer);
     this.browser.close();
     return;
   }
+  /**
+   * End of StopApp Function
+   */
 
+  /**
+   * Start of Start Function
+   */
   async start() {
     if (!this.page) {
       await this.init();
@@ -73,6 +98,7 @@ class App {
         const amount = Array.from(document.querySelectorAll("table tr td .amount-pay"));
         return { tradeNum, amount: amount.map(am => am.textContent) };
       });
+
       if (data) {
         console.log(App.formatingList(data.tradeNum, data.amount));
         let foundLog = App.formatingList(data.tradeNum, data.amount);
@@ -96,11 +122,20 @@ class App {
       console.log(chalk.red(error.message));
     }
   }
+  /**
+   * End of Start Function
+   */
 }
 
+/**
+ * Start of Run Function
+ */
 function run() {
-  var newApp = new App();
+  let newApp = new App();
   newApp.start();
 }
+/**
+ * End of Run Function
+ */
 
 run();
