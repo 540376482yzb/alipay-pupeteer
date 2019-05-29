@@ -1,7 +1,10 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const puppeteer = require("puppeteer");
 const devices = require("puppeteer/DeviceDescriptors");
 const chalk = require("chalk");
 const DBServer = require("./db/db.conn");
+const odTwilio = require("@odinternational/od-sms");
 
 class App {
   constructor() {
@@ -35,6 +38,17 @@ class App {
     }
   }
   /**  End of _saveDataToDataBase Function **/
+
+  async _checkIfRequiredScan() {
+    console.log("before");
+    let example = await this.page.$("#risk_qrcode_cnt");
+    console.log("after");
+    if (await example.isIntersectingViewport()) {
+      console.log(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+      const sms = new odTwilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+      sms.sendMessage("快来扫一下!", process.env.TWILIO_NUMBER, "+16266077322");
+    }
+  }
 
   /** Start of _getBrowserData Function **/
   async _getBrowserData() {
@@ -92,13 +106,15 @@ class App {
 
   /**  Start of Start Function **/
   async start() {
+    console.log("start");
     if (!this.page) {
       await this.init();
     }
     try {
       await this.page.goto("https://consumeprod.alipay.com/record/standard.htm");
+      await this.page.waitForNavigation();
       console.log("========= 等待抓取数据 ==================");
-      // await this.page.waitForNavigation();
+      await this._checkIfRequiredScan();
       await this.page.waitFor("#tradeRecordsIndex");
       console.log(chalk.blue("========== 寻找数据成功 ========"));
       const data = await this._getBrowserData();
@@ -109,7 +125,8 @@ class App {
     } catch (error) {
       if (
         error.message === "Navigation Timeout Exceeded: 30000ms exceeded" ||
-        error.message.includes(`waiting for selector`)
+        error.message.includes(`waiting for selector`) ||
+        error.message === 'waiting for selector "#tradeRecordsIndex" failed: timeout 30000ms exceeded'
       ) {
         console.log("restarting");
         this.start();
@@ -128,3 +145,17 @@ function run() {
 /**  End of Run Function **/
 
 run();
+
+// let example = await page.$("#J-checkcode-img");
+
+// while (await example.isIntersectingViewport()) {
+//   // The element IS visible within the current viewport.
+//   console.log(chalk.blue("========== 有验证码 ========"));
+
+//   await page.reload();
+//   example = await page.$("#J-checkcode-img");
+//   await page.waitFor("#J-loginMethod-tabs > li:nth-child(2)");
+//   await page.click("#J-loginMethod-tabs > li:nth-child(2)");
+
+//   console.log(chalk.green("========== 点击成功 ======="));
+// }
