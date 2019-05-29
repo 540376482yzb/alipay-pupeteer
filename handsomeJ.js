@@ -81,11 +81,9 @@ class App {
 
   /** Start of StopApp Function **/
   stop() {
-    if (this.page) {
-      this.page = null;
-      clearTimeout(this.timer);
-      this.browser.close();
-    }
+    this.page = null;
+    clearTimeout(this.timer);
+    this.browser.close();
     return;
   }
   /**  End of StopApp Function **/
