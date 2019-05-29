@@ -47,16 +47,12 @@ class App {
 
   stopApp() {
     this.page = null;
-    this.stop = true;
+    clearTimeout(this.timer);
+    this.browser.close();
+    return;
   }
 
   async start() {
-    if (this.stop) {
-      clearTimeout(this.timer);
-      this.browser.close();
-      return;
-    }
-
     if (!this.page) {
       await this.init();
     }
