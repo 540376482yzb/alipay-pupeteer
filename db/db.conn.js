@@ -27,7 +27,7 @@ class CrawlerDBService {
     console.log("========  finding logs ...... =============");
     console.log(logCache);
     console.log("========   =============");
-    return logCache;
+    return logCache || [];
   }
 
   async compareLogs(logs = []) {
