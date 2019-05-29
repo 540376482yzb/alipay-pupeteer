@@ -8,6 +8,9 @@ const DBServer = require("./db/db.conn");
 class App {
   constructor() {
     this.page = null;
+    this.browser = null;
+    this.stop = false;
+    this.timer = null;
   }
   static formatingList(tradeNum, amount) {
     let tempArray = [];
@@ -20,24 +23,36 @@ class App {
     return tempArray;
   }
   async init() {
-    const browser = await puppeteer.launch({
+    this.browser = await puppeteer.launch({
       headless: false
     });
-    this.page = await browser.newPage();
+    this.page = await this.browser.newPage();
+    this.stop = false;
+    this.timer = null;
     //await this.page.emulate(devices["iPad"]);
   }
 
   async redirect() {
+    if (this.stop) {
+      clearTimeout(this.timer);
+      this.browser.close();
+      return;
+    }
     let random = Math.floor(Math.random(5) * 1000);
     try {
       console.log(chalk.blue("========== 进入跳转 ========"));
       await this.page.goto("https://my.alipay.com/portal/i.htm");
-      setTimeout(() => {
+      this.timer = setTimeout(() => {
         this.start();
       }, 10000 + random);
     } catch (err) {
       console.log(chalk.red("error when redirect"));
     }
+  }
+
+  stopApp() {
+    this.page = null;
+    this.stop = true;
   }
 
   async start() {
