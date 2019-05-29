@@ -13,6 +13,9 @@ class CrawlerDBService {
 
     const oldLogs = await this.findLogs()
     const newLogs = [...oldLogs, ...logs]
+    console.log('========  saving ...... =============')
+    console.log(newLogs)
+    console.log('========   =============')
     redis.setAsync("DB-LOG",this.hand_token, newLogs, 2592000);
   }
   
@@ -22,8 +25,9 @@ class CrawlerDBService {
     }
 
     const logCache = await redis.getAsync("DB-LOG", hand_token || this.hand_token);
-    //TODO: remove log
-    console.log('what is my log Cache',logCache)
+    console.log('========  finding logs ...... =============')
+    console.log(logCache)
+    console.log('========   =============')
     return logCache;
   }
 
