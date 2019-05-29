@@ -33,11 +33,6 @@ class App {
   }
 
   async redirect() {
-    if (this.stop) {
-      clearTimeout(this.timer);
-      this.browser.close();
-      return;
-    }
     let random = Math.floor(Math.random(5) * 1000);
     try {
       console.log(chalk.blue("========== 进入跳转 ========"));
@@ -56,6 +51,12 @@ class App {
   }
 
   async start() {
+    if (this.stop) {
+      clearTimeout(this.timer);
+      this.browser.close();
+      return;
+    }
+
     if (!this.page) {
       await this.init();
     }
