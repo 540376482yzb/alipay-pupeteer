@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer");
 const devices = require("puppeteer/DeviceDescriptors");
 const chalk = require("chalk");
+const DBServer = require("./db/db.conn");
 
 // TODO: Set up username and password
 const USERNAME = "";
@@ -59,12 +60,18 @@ class App {
             return el != null;
           });
         const amount = Array.from(document.querySelectorAll("table tr td .amount-pay"));
-        // let dataList = formatingList();
         return { tradeNum, amount: amount.map(am => am.textContent) };
       });
       if (data) {
         console.log(App.formatingList(data.tradeNum, data.amount));
-        //this.redirect();
+        let foundLog = App.formatingList(data.tradeNum, data.amount);
+        let dataBase = new DBServer("asdf");
+        let tempArray = await dataBase.compareLogs(foundLog);
+        if (tempArray.length > 0) {
+          //TODO: send data to king
+          dataBase.saveLogs(tempArray);
+        }
+        this.redirect();
       }
     } catch (error) {
       if (
