@@ -40,11 +40,8 @@ class App {
   /**  End of _saveDataToDataBase Function **/
 
   async _checkIfRequiredScan() {
-    console.log("before");
     let example = await this.page.$("#risk_qrcode_cnt");
-    console.log("after");
     if (await example.isIntersectingViewport()) {
-      console.log(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
       const sms = new odTwilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
       sms.sendMessage("快来扫一下!", process.env.TWILIO_NUMBER, "+16266077322");
     }
