@@ -86,7 +86,7 @@ class PSBC {
       await this._clickEvent("#queryButton");
       this.timer = setTimeout(() => {
         this.redirect();
-      }, 10000 + random);
+      }, 30000 + random);
     } catch (err) {
       console.log(chalk.red("error when redirect"));
     }
@@ -120,7 +120,7 @@ class PSBC {
       await this.page.waitForSelector(selector);
       let currEvent = await this.page.$(selector);
       if (currEvent) {
-        this._checkIfWrongConExisted();
+        await this._checkIfWrongConExisted();
         currEvent.click();
       }
     } catch (e) {
