@@ -45,13 +45,15 @@ class CrawlerDBService {
   }
 
   static _diffLogInCache(log, cachedLogs) {
-    let flag = false;
+    let isSame = false;
     for (let cache of cachedLogs) {
-      if (log.tradeNo == cache.tradeNo) {
-        flag = true;
+      const hashLog = JSON.stringify(log);
+      const cacheLog = JSON.stringify(cache);
+      if (hashLog === cacheLog) {
+        isSame = true;
       }
     }
-    return flag ? undefined : log;
+    return isSame ? undefined : log;
   }
 }
 
