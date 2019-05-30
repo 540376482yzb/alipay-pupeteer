@@ -80,13 +80,13 @@ class PSBC {
 
   /** Start of Redirect Function **/
   async redirect() {
-    let random = Math.floor(Math.random(5) * 1000);
+    let random = Math.floor(Math.random(2) * 1000);
     try {
       console.log(chalk.blue("========== 进入跳转 ========"));
       await this._clickEvent("#queryButton");
       this.timer = setTimeout(() => {
         this.redirect();
-      }, 30000 + random);
+      }, 15000 + random);
     } catch (err) {
       console.log(chalk.red("error when redirect"));
     }
@@ -120,7 +120,9 @@ class PSBC {
       await this.page.waitForSelector(selector);
       let currEvent = await this.page.$(selector);
       if (currEvent) {
-        await this._checkIfWrongConExisted();
+        if (selector === "#queryButton") {
+          await this._checkIfWrongConExisted();
+        }
         currEvent.click();
       }
     } catch (e) {
@@ -130,7 +132,6 @@ class PSBC {
 
   async _checkIfWrongConExisted() {
     try {
-      await this.page.waitForSelector(".dook");
       let currEvent = await this.page.$(".dook");
       if (currEvent) {
         currEvent.click();
@@ -164,6 +165,7 @@ class PSBC {
       // }
     } catch (error) {
       console.log(chalk.red(error));
+      this.start();
     }
   }
   /**  End of Start Function **/
