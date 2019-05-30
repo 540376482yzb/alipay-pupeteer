@@ -11,7 +11,8 @@ class BOC {
     this.page = null;
     this.browser = null;
     this.timer = null;
-    this.errorCounter = 0;
+    this.errorCounter = null;
+    this.dataBase = null;
   }
 
   /**
@@ -96,12 +97,14 @@ class BOC {
     }
   }
 
-  async init() {
+  async _init() {
     this.browser = await puppeteer.launch({
       headless: false
     });
     this.page = await this.browser.newPage();
     this.timer = null;
+    this.errorCounter = 0;
+    this.dataBase = new DBServer();
     //await this.page.emulate(devices["iPad"]);
   }
 
@@ -118,7 +121,7 @@ class BOC {
   async start() {
     console.log("start");
     if (!this.page) {
-      await this.init();
+      await this._init();
     }
     try {
       await this.page.goto("https://ebsnew.boc.cn/boc15/login.html", { timeout: 0 });
