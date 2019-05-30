@@ -148,7 +148,8 @@ class PSBC {
       await this.init();
     }
     try {
-      await this.page.goto("https://pbank.psbc.com/perbank/index.html");
+      await this.page.goto("https://pbank.psbc.com/perbank/index.html", { timeout: 0 });
+      console.log("before");
       await this._checkElementExisted();
       console.log("out");
       await this._clickEvent('[data-menuno="A00300000"]');
