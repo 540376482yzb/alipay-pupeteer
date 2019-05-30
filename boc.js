@@ -20,12 +20,13 @@ class BOC {
     const singleData = data
       .filter(info => info.includes("支付宝转账"))
       .map(info => {
-        return info.trim().split(/\s+/);
+        let curr = info.trim().split(/\s+/);
+        return {
+          amount: curr[4],
+          date: curr[0]
+        };
       });
-    return {
-      amount: singleData[3],
-      date: singleData[0]
-    };
+    return singleData;
   }
 
   async _saveDataToDataBase(data) {
