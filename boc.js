@@ -82,7 +82,7 @@ class BOC {
     }
   }
 
-  async redirect() {
+  async _redirect() {
     let random = Math.floor(Math.random(2) * 1000);
     try {
       await this._clickEvent("#btn_49_740974");
@@ -90,7 +90,7 @@ class BOC {
       const data = await this._getBrowserData();
       await this._saveDataToDataBase(data);
       this.timer = setTimeout(() => {
-        this.redirect();
+        this._redirect();
       }, 15000 + random);
     } catch (err) {
       console.log(chalk.red(err));
@@ -127,7 +127,7 @@ class BOC {
       await this.page.goto("https://ebsnew.boc.cn/boc15/login.html", { timeout: 0 });
       await this._checkElementExisted("#btn_login_79676");
       await this._clickEvent('[lan="l0176"]');
-      await this.redirect();
+      await this._redirect();
     } catch (error) {
       console.log(chalk.red(error));
       this.errorCounter++;
