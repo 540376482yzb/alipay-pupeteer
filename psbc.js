@@ -6,7 +6,7 @@ const chalk = require("chalk");
 const DBServer = require("./db/db.conn");
 const odTwilio = require("@odinternational/od-sms");
 
-class App {
+class PSBC {
   constructor() {
     this.page = null;
     this.browser = null;
@@ -28,6 +28,7 @@ class App {
 
   /** Start of _saveDataToDataBase Function **/
   async _saveDataToDataBase(data) {
+    console.log(JSON.stringify(data));
     let foundLog = App._formatingList(data.tradeNum, data.amount);
     let dataBase = new DBServer("asdf");
     let tempArray = await dataBase.compareLogs(foundLog);
@@ -41,7 +42,7 @@ class App {
 
   async _checkIfRequiredScan() {
     let example = await this.page.$("#risk_qrcode_cnt");
-    if (await example.isIntersectingViewport()) {
+    if (example && example.isIntersectingViewport()) {
       const sms = new odTwilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
       sms.sendMessage("快来扫一下!", process.env.TWILIO_NUMBER, "+16266077322");
     }
@@ -58,6 +59,8 @@ class App {
           return el != null;
         });
       const amount = Array.from(document.querySelectorAll("table tr td .amount-pay"));
+      console.log(tradeNum, amount);
+
       return { tradeNum, amount: amount.map(am => am.textContent) };
     });
     return data;
@@ -80,9 +83,9 @@ class App {
     let random = Math.floor(Math.random(5) * 1000);
     try {
       console.log(chalk.blue("========== 进入跳转 ========"));
-      await this.page.goto("https://my.alipay.com/portal/i.htm");
+      await this._clickEvent("#queryButton");
       this.timer = setTimeout(() => {
-        this.start();
+        this.redirect();
       }, 10000 + random);
     } catch (err) {
       console.log(chalk.red("error when redirect"));
@@ -101,6 +104,42 @@ class App {
   }
   /**  End of StopApp Function **/
 
+  async _checkElementExisted() {
+    try {
+      await this.page.waitForSelector("#labName");
+      console.log("as");
+      await this._checkElementExisted();
+    } catch (error) {
+      console.log("hello");
+      return;
+    }
+  }
+
+  async _clickEvent(selector) {
+    try {
+      await this.page.waitForSelector(selector);
+      let currEvent = await this.page.$(selector);
+      if (currEvent) {
+        this._checkIfWrongConExisted();
+        currEvent.click();
+      }
+    } catch (e) {
+      console.log("clickEvent" + e);
+    }
+  }
+
+  async _checkIfWrongConExisted() {
+    try {
+      await this.page.waitForSelector(".dook");
+      let currEvent = await this.page.$(".dook");
+      if (currEvent) {
+        currEvent.click();
+      }
+    } catch (e) {
+      return;
+    }
+  }
+
   /**  Start of Start Function **/
   async start() {
     console.log("start");
@@ -108,27 +147,23 @@ class App {
       await this.init();
     }
     try {
-      await this.page.goto("https://consumeprod.alipay.com/record/standard.htm");
-      await this.page.waitForNavigation();
-      console.log("========= 等待抓取数据 ==================");
-      await this._checkIfRequiredScan();
-      await this.page.waitFor("#tradeRecordsIndex");
-      console.log(chalk.blue("========== 寻找数据成功 ========"));
-      const data = await this._getBrowserData();
-      if (data) {
-        this._saveDataToDataBase(data);
-        this.redirect();
-      }
+      await this.page.goto("https://pbank.psbc.com/perbank/index.html");
+      await this._checkElementExisted();
+      console.log("out");
+      await this._clickEvent('[data-menuno="A00300000"]');
+      await this._clickEvent('[data-menuno="C00312000"]');
+      this.redirect();
+      // console.log("========= 等待抓取数据 ==================");
+      // await this._checkIfRequiredScan();
+      // await this.page.waitFor("#tradeRecordsIndex");
+      // console.log(chalk.blue("========== 寻找数据成功 ========"));
+      // const data = await this._getBrowserData();
+      // if (data) {
+      //   this._saveDataToDataBase(data);
+      //   this.redirect();
+      // }
     } catch (error) {
-      if (
-        error.message === "Navigation Timeout Exceeded: 30000ms exceeded" ||
-        error.message.includes(`waiting for selector`) ||
-        error.message === 'waiting for selector "#tradeRecordsIndex" failed: timeout 30000ms exceeded'
-      ) {
-        console.log("restarting");
-        this.start();
-      }
-      console.log(chalk.red(error.message));
+      console.log(chalk.red(error));
     }
   }
   /**  End of Start Function **/
@@ -136,23 +171,9 @@ class App {
 
 /**  Start of Run Function **/
 function run() {
-  let newApp = new App();
+  let newApp = new PSBC();
   newApp.start();
 }
 /**  End of Run Function **/
 
 run();
-
-// let example = await page.$("#J-checkcode-img");
-
-// while (await example.isIntersectingViewport()) {
-//   // The element IS visible within the current viewport.
-//   console.log(chalk.blue("========== 有验证码 ========"));
-
-//   await page.reload();
-//   example = await page.$("#J-checkcode-img");
-//   await page.waitFor("#J-loginMethod-tabs > li:nth-child(2)");
-//   await page.click("#J-loginMethod-tabs > li:nth-child(2)");
-
-//   console.log(chalk.green("========== 点击成功 ======="));
-// }
