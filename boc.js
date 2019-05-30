@@ -21,9 +21,11 @@ class BOC {
       .filter(info => info.includes("支付宝转账"))
       .map(info => {
         let curr = info.trim().split(/\s+/);
+        console.log(curr);
         return {
           amount: curr[4],
-          date: curr[0]
+          date: curr[0],
+          desc: curr[8]
         };
       });
     return singleData;
