@@ -29,8 +29,8 @@ class BOC {
   }
 
   async _saveDataToDataBase(data) {
-    let foundLog = this._formatingData(data);
-    console.log(chalk.cyanBright(JSON.stringify(data)));
+    let foundLog = BOC._formatingData(data);
+    console.log(chalk.cyanBright(JSON.stringify(foundLog)));
     let dataBase = new DBServer("asdf");
     let tempArray = await dataBase.compareLogs(foundLog);
     if (tempArray.length > 0) {
