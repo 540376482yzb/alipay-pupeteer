@@ -11,6 +11,7 @@ class BOC {
     this.page = null;
     this.browser = null;
     this.timer = null;
+    this.errorCounter = 0;
   }
 
   /**
@@ -107,6 +108,7 @@ class BOC {
   stop() {
     if (this.page && this.browser) {
       this.page = null;
+      this.errorCounter = 0;
       clearTimeout(this.timer);
       this.browser.close();
     }
@@ -125,6 +127,10 @@ class BOC {
       await this.redirect();
     } catch (error) {
       console.log(chalk.red(error));
+      this.errorCounter++;
+      if (this.errorCounter >= 10) {
+        return new Error("BOC 程序有问题 " + error);
+      }
       this.start();
     }
   }
