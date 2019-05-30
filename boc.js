@@ -4,7 +4,7 @@ const puppeteer = require("puppeteer");
 const devices = require("puppeteer/DeviceDescriptors");
 const chalk = require("chalk");
 const DBServer = require("./db/db.conn");
-const odTwilio = require("@odinternational/od-sms");
+const OdTwilio = require("@odinternational/od-sms");
 
 class BOC {
   constructor() {
@@ -129,12 +129,16 @@ class BOC {
       await this._clickEvent('[lan="l0176"]');
       await this._redirect();
     } catch (error) {
-      console.log(chalk.red(error));
       this.errorCounter++;
       if (this.errorCounter >= 10) {
+        let sms = new OdTwilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+        sms.sendMessage("有问题了 快来看看！", process.env.TWILIO_NUMBER, "+16262974820");
+        this.stop();
         return new Error("BOC 程序有问题 " + error);
       }
-      this.start();
+      if (this.errorCounter < 10) {
+        this.start();
+      }
     }
   }
 }
